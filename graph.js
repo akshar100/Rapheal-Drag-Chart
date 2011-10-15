@@ -27,7 +27,7 @@ var Rg = function(config){
 		
 		for(var dot in this.yaxis)
 		{
-			this.paper.text(this.dotsize, this.ylen-spacing*i, this.yaxis[dot]+","+(this.ylen-spacing*i) ); i++;
+			this.paper.text(this.dotsize, this.ylen-spacing*i, this.yaxis[dot] ); i++;
 			this.gridStack.push(this.ylen-spacing*i+this.yseparator)
 		}
 		this.gridStack = this.gridStack.reverse();
