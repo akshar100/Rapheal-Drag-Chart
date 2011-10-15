@@ -13,6 +13,27 @@ var Rg = function(config){
 	this.paper = null;
 	this.dotStack = [];
 	this.gridStack = [ ];
+	this.pathStack = [];
+	this.Line = function(startX, startY, endX, endY, raphael) {
+	    var start = {
+	        x: startX,
+	        y: startY
+	    };
+	    var end = {
+	        x: endX,
+	        y: endY
+	    };
+	    var getPath = function() {
+	        return "M" + start.x + " " + start.y + " L" + end.x + " " + end.y;
+	    };
+	    var redraw = function() {
+	        node.attr("path", getPath());
+	    }
+	
+	    var node = raphael.path(getPath()).attr({fill: '#9cf', stroke: '#ddd', 'stroke-width': 5});
+	    return node;
+	};
+
 	
 	 
 	this.render = function()
@@ -39,7 +60,8 @@ var Rg = function(config){
 		var snap = this.snap;
 		var previous  = this.dotStack.length>0 && this.dotStack[this.dotStack.length-1] ;
 		var gridStack = this.gridStack ;
-		var ylen = this.ylen; 
+		var ylen = this.ylen;
+		var parent = this;
 		for(var dot in this.xaxis)
 		{
 			circle = this.paper.circle(i*(this.separator),this.ylen-this.dotsize*2,this.dotsize).attr({
@@ -49,7 +71,7 @@ var Rg = function(config){
 			});
 			i++;
 			
-			console.log(gridStack);
+			
 			var start = function () {
 			    // storing original coordinates
 			    this.ox = this.attr("cx");
@@ -59,20 +81,13 @@ var Rg = function(config){
 			    
 			},
 			move = function (dx, dy) {
-			
-			
-			
-				
-			    
+	
 			    if((this.oy+dy)<initial_position && (this.oy + dy - dotsize)>0)
 			 	{			   	
 			   		this.attr({cx: this.ox, cy: this.oy + dy});
 			   		this.__y = this.oy + dy;
+			   		redraw(parent);
 			   	}
-			    
-				
-			   
-			   
 			},
 			up = function () {
 			    var c_y =  this.__y;
@@ -87,13 +102,14 @@ var Rg = function(config){
 							
 			    			if( (gridStack[i-1] - c_y ) > (c_y - gridStack[i]) )
 			    			{
-			    				console.log(c_y);
+			    				
 			    				this.attr({cx: this.ox, cy: gridStack[i-1]});
 			    			}
 			    			else
 			    			{
 			    				this.attr({cx: this.ox, cy: gridStack[i]});
 			    			}
+			    			redraw(parent);
 			    		}
 			    	}
 			    }
@@ -103,9 +119,26 @@ var Rg = function(config){
 			circle.drag(move, start, up);  
 			this.dotStack.push(circle);
 		}
+		redraw(this);
+		
 		
 	};
-	
+	var redraw= function(parent)
+	{
+		for(var path in parent.pathStack)
+		{
+			parent.pathStack[path].remove();
+		}
+		for(var i=0; i<parent.dotStack.length-1;i++)
+		{
+			
+			var line = parent.Line(parent.dotStack[i].attrs.cx, parent.dotStack[i].attrs.cy, parent.dotStack[i+1].attrs.cx,parent.dotStack[i+1].attrs.cy, parent.paper); 
+			parent.dotStack[i].toFront();
+			parent.dotStack[i+1].toFront();
+			parent.pathStack.push(line);
+			
+		}
+	}
 	this.randomColor = function(){
 		
 		var letters = '0123456789ABCDEF'.split('');
