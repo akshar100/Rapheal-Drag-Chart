@@ -1,0 +1,13 @@
+First include rapheal.js and then include graph.js
+
+USAGE::
+var graph = new Rg({
+				container:document.getElementById("canvas_container"),
+				x:[1,2,3,4,5,6,7],
+				y:[1,2,3,4],
+				snap:true
+			}); 
+			graph.render();
+
+It automatically claculates the height based on the datapoitns submitted. 
+You can also specifiy "dotsize" and "separator" which are respectively the radius and separation between datapoints. 
