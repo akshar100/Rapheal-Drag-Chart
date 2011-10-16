@@ -11,3 +11,9 @@ var graph = new Rg({
 
 It automatically claculates the height based on the datapoitns submitted. 
 You can also specifiy "dotsize" and "separator" which are respectively the radius and separation between datapoints. 
+
+To obtain the data points once user drags the the datapoints call
+
+graph.getPoints();
+
+points are automatically normalized to the the y scale provided in the contructor. 

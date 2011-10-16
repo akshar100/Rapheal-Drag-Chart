@@ -4,7 +4,7 @@ var Rg = function(config){
 	this.container = config.container || document; 
 	this.xaxis = config.x; 
 	this.yaxis = config.y;  
-	this.snap = false || config.snap;
+	this.snap = true || config.snap;
 	this.separator = 35 || config.separator;
 	this.yseparator = 50;
 	this.dotsize = 5 || config.dotsize;
@@ -14,6 +14,16 @@ var Rg = function(config){
 	this.dotStack = [];
 	this.gridStack = [ ];
 	this.pathStack = [];
+	this.minWidth = config.minWidth || 400; 
+	
+
+	if(this.xlen<200)
+	{
+		this.xlen = 400; 
+		this.separator = this.xlen/this.xaxis.length - this.dotsize;
+	}
+	
+	
 	this.Line = function(startX, startY, endX, endY, raphael,color,width) {
 		color = color || '#aaa';
 		width = width || 5;
@@ -40,9 +50,9 @@ var Rg = function(config){
 	 
 	this.render = function()
 	{
-		this.container.style.width = this.xlen+'px';
+		this.container.style.width = this.xlen+30+'px';
 		this.container.style.height = (this.ylen+30)+'px';
-		this.paper = new Raphael(this.container, this.xlen, this.ylen+30);
+		this.paper = new Raphael(this.container, this.xlen+30, this.ylen+30);
 		this.Line(0,this.ylen,this.xlen,this.ylen,this.paper,'#000',2);
 		this.Line(this.dotsize+15,0,this.dotsize+15,this.ylen+30,this.paper,'#000',2);
 		var i = 1 ; 
@@ -72,13 +82,14 @@ var Rg = function(config){
 				cursor:'pointer',
 				opacity: 1
 			});
+			circle._data_id = dot; 
 			var text =  this.xaxis[dot]; 
 			circle.mouseover((function(c,t){ return function(){
 				if(c.tooltip && typeof c.tooltip.remove =="function")
 				{
 					c.tooltip.remove();
 				}
-				console.log(c);
+				
 				c.attr({r:dotsize+3});
 				c.tooltip =  c.paper.text(c.attrs.cx+15,c.attrs.cy-15, t).attr({
 					fill:'#f00'
@@ -163,7 +174,7 @@ var Rg = function(config){
 		
 		
 	};
-	var redraw= function(parent)
+	var redraw = function(parent)
 	{
 		for(var path in parent.pathStack)
 		{
@@ -178,6 +189,13 @@ var Rg = function(config){
 			parent.pathStack.push(line);
 			
 		}
+		//Line from origin
+		
+		line = parent.Line( parent.dotsize+15 ,parent.ylen , parent.dotStack[0].attrs.cx,parent.dotStack[0].attrs.cy, parent.paper); 
+		parent.dotStack[0].toFront();
+		parent.dotStack[0].toFront();
+		parent.pathStack.push(line);
+		
 	}
 	this.randomColor = function(){
 		
@@ -189,6 +207,34 @@ var Rg = function(config){
 	    return color;
 
 	};
+	
+	this.getPoints=function()
+	{
+		var that = this; 
+		var point = function(id,x,y){
+			
+			var ymin = Math.min.apply(null,that.yaxis);
+			var ymax = Math.max.apply(null,that.yaxis);  
+			//console.log(ymax,ymin);
+			if(y == that.dotsize*2) { y = 0; }
+			else{ y += that.dotsize*2; } 
+			var y_val = Math.round.apply(null,ymax*y/that.ylen);
+						
+			return {
+				x:x,
+				y:y_val,
+				id:id
+			};
+			
+		};
+		var points = [];
+		for(var p in this.dotStack)
+		{
+			points.push(new point(this.dotStack[p]._data_id,this.dotStack[p].attrs.cx,this.ylen - this.dotStack[p].attrs.cy) );	
+		}
+		
+		return points; 
+	}
 	
 	
 	
