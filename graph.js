@@ -14,7 +14,9 @@ var Rg = function(config){
 	this.dotStack = [];
 	this.gridStack = [ ];
 	this.pathStack = [];
-	this.Line = function(startX, startY, endX, endY, raphael) {
+	this.Line = function(startX, startY, endX, endY, raphael,color,width) {
+		color = color || '#aaa';
+		width = width || 5;
 	    var start = {
 	        x: startX,
 	        y: startY
@@ -30,7 +32,7 @@ var Rg = function(config){
 	        node.attr("path", getPath());
 	    }
 	
-	    var node = raphael.path(getPath()).attr({fill: '#9cf', stroke: '#ddd', 'stroke-width': 5});
+	    var node = raphael.path(getPath()).attr({fill: color, stroke: color, 'stroke-width': width});
 	    return node;
 	};
 
@@ -39,9 +41,10 @@ var Rg = function(config){
 	this.render = function()
 	{
 		this.container.style.width = this.xlen+'px';
-		this.container.style.height = this.ylen+'px';
-		this.paper = new Raphael(this.container, this.xlen, this.ylen);
-		
+		this.container.style.height = (this.ylen+30)+'px';
+		this.paper = new Raphael(this.container, this.xlen, this.ylen+30);
+		this.Line(0,this.ylen,this.xlen,this.ylen,this.paper,'#000',2);
+		this.Line(this.dotsize+15,0,this.dotsize+15,this.ylen+30,this.paper,'#000',2);
 		var i = 1 ; 
 		var circle; 
 		var spacing = this.ylen/this.yaxis.length -5;
@@ -69,19 +72,23 @@ var Rg = function(config){
 				cursor:'pointer',
 				opacity: 1
 			});
-			var text = this.xaxis[dot];
-			circle.mouseover(function(){
-				if(this.tooltip && typeof this.tooltip.remove =="function")
+			var text =  this.xaxis[dot]; 
+			circle.mouseover((function(c,t){ return function(){
+				if(c.tooltip && typeof c.tooltip.remove =="function")
 				{
-					this.tooltip.remove();
+					c.tooltip.remove();
 				}
-				this.tooltip =  this.paper.text(this.attrs.cx+15,this.attrs.cy-15, text).attr({
+				console.log(c);
+				c.attr({r:dotsize+3});
+				c.tooltip =  c.paper.text(c.attrs.cx+15,c.attrs.cy-15, t).attr({
 					fill:'#f00'
 				});
-			});
+			};
+		})(circle,text) 
+			);
 			
 			circle.mouseout(function(){
-				
+				this.attr({r:dotsize});
 				if(this.tooltip && typeof this.tooltip.remove =="function")
 				{
 					this.tooltip.remove();
@@ -96,6 +103,7 @@ var Rg = function(config){
 			    this.ox = this.attr("cx");
 			    this.oy = this.attr("cy");
 			    this.attr({opacity: 0.5});
+			    this.attr({r:dotsize});
 			    if(this.tooltip && typeof this.tooltip.remove =="function")
 				{
 					this.tooltip.remove();
@@ -110,6 +118,7 @@ var Rg = function(config){
 			   		this.__y = this.oy + dy;
 			   		redraw(parent);
 			   	}
+			   	this.attr({r:dotsize+3});
 			   	if(this.tooltip && typeof this.tooltip.remove =="function")
 				{
 					this.tooltip.remove();
@@ -140,6 +149,7 @@ var Rg = function(config){
 			    	}
 			    }
 			    this.attr({opacity: 1});
+			    this.attr({r:dotsize});
 			    if(this.tooltip && typeof this.tooltip.remove =="function")
 				{
 					this.tooltip.remove();
