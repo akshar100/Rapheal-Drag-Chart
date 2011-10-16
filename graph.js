@@ -69,6 +69,25 @@ var Rg = function(config){
 				cursor:'pointer',
 				opacity: 1
 			});
+			var text = this.xaxis[dot];
+			circle.mouseover(function(){
+				if(this.tooltip && typeof this.tooltip.remove =="function")
+				{
+					this.tooltip.remove();
+				}
+				this.tooltip =  this.paper.text(this.attrs.cx+15,this.attrs.cy-15, text).attr({
+					fill:'#f00'
+				});
+			});
+			
+			circle.mouseout(function(){
+				
+				if(this.tooltip && typeof this.tooltip.remove =="function")
+				{
+					this.tooltip.remove();
+				}
+			});
+			
 			i++;
 			
 			
@@ -77,7 +96,10 @@ var Rg = function(config){
 			    this.ox = this.attr("cx");
 			    this.oy = this.attr("cy");
 			    this.attr({opacity: 0.5});
-			    
+			    if(this.tooltip && typeof this.tooltip.remove =="function")
+				{
+					this.tooltip.remove();
+				}
 			    
 			},
 			move = function (dx, dy) {
@@ -88,6 +110,10 @@ var Rg = function(config){
 			   		this.__y = this.oy + dy;
 			   		redraw(parent);
 			   	}
+			   	if(this.tooltip && typeof this.tooltip.remove =="function")
+				{
+					this.tooltip.remove();
+				}
 			},
 			up = function () {
 			    var c_y =  this.__y;
@@ -114,6 +140,10 @@ var Rg = function(config){
 			    	}
 			    }
 			    this.attr({opacity: 1});
+			    if(this.tooltip && typeof this.tooltip.remove =="function")
+				{
+					this.tooltip.remove();
+				}
 			};
 			
 			circle.drag(move, start, up);  
