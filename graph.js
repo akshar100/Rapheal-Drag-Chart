@@ -15,6 +15,7 @@ var Rg = function(config){
 	this.gridStack = [ ];
 	this.pathStack = [];
 	this.minWidth = config.minWidth || 400; 
+	this.title = config.title || "";
 	
 
 	if(this.xlen<200)
@@ -52,9 +53,21 @@ var Rg = function(config){
 	{
 		this.container.style.width = this.xlen+30+'px';
 		this.container.style.height = (this.ylen+30)+'px';
+		
 		this.paper = new Raphael(this.container, this.xlen+30, this.ylen+30);
 		this.Line(0,this.ylen,this.xlen,this.ylen,this.paper,'#000',2);
 		this.Line(this.dotsize+15,0,this.dotsize+15,this.ylen+30,this.paper,'#000',2);
+		
+		
+		this.paper.text(this.xlen/2,this.ylen/2, this.title).attr({
+					fill:'#666',
+					"fill-opacity": .3,
+					"stroke-width": 1, 
+					"stroke-linecap": "round",
+					"font-size":'35px'
+				});
+		
+		
 		var i = 1 ; 
 		var circle; 
 		var spacing = this.ylen/this.yaxis.length -5;
